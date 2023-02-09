@@ -1,12 +1,19 @@
 <?php
 
 require_once 'autoload.php';
-require_once 'Utilities/helpers.php';
 
-use Utilities\Helpers;
+if(!defined('ABSPATH')) define('ABSPATH', __DIR__);
 
-if(!defined('ABSPATH'))
-    define('ABSPATH', __DIR__);
+use Utilities\Router;
 
+$router = new Router();
+$router->setNamespace('\App');
 
-echo Helpers::getUrl();
+$router->get('/', 'Bot@index');
+
+$router->set404(function(){
+    header('HTTP/1.1 404 Not Found');
+    echo 'this is 404 page';
+});
+
+$router->run();
