@@ -10,7 +10,7 @@ use Utilities\Helpers;
 use Utilities\Router;
 
 global $telegram;
-$telegram = new Telegram(Helpers::config('bot_token'));
+$telegram = new Telegram(Helpers::config('bot_token'),Helpers::config('bot_username'));
 
 $router = new Router();
 $router->setNamespace('\App');

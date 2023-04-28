@@ -4,12 +4,12 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInita9056d8da0bdfa00e5507266f6692287
+class ComposerStaticInitb1288b551a3b6b3f1a3456394f41b797
 {
     public static $files = array (
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
-        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
+        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
     );
 
@@ -35,7 +35,7 @@ class ComposerStaticInita9056d8da0bdfa00e5507266f6692287
     public static $prefixDirsPsr4 = array (
         'Psr\\Log\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/log/src',
+            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
         ),
         'Psr\\Http\\Message\\' => 
         array (
@@ -71,9 +71,9 @@ class ComposerStaticInita9056d8da0bdfa00e5507266f6692287
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInita9056d8da0bdfa00e5507266f6692287::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInita9056d8da0bdfa00e5507266f6692287::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInita9056d8da0bdfa00e5507266f6692287::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitb1288b551a3b6b3f1a3456394f41b797::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitb1288b551a3b6b3f1a3456394f41b797::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitb1288b551a3b6b3f1a3456394f41b797::$classMap;
 
         }, null, ClassLoader::class);
     }

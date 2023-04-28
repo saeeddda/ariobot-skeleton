@@ -1,11 +1,12 @@
 {
-    "bot_token" : "5930091624:AAH_ykCnj2BylXdkYJQiCOAt7XPZV3aRGkA",
+    "bot_token" : "274168747:AAEhWzy9AB0ajPhWu01nDNgTnc4awHgr79Q",
+  	"bot_username" : "SamrtTelegramBot",
     "admin_token" : "",
-    "admin_id" : "",
+    "admin_id" : "159774921",
     "host" : "localhost",
     "port" : "3306",
-    "user" : "",
-    "password" : "",
-    "database" : "",
-    "webhook_url" : ""
+    "user" : "saeednoo_botusr",
+    "password" : "F0Jb1xhwV",
+    "database" : "saeednoo_bot",
+    "webhook_url" : "https://saeed-noori.ir/webhook"
 }

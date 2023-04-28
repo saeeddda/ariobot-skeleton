@@ -22,7 +22,7 @@ class Bot{
 
         global $telegram;
         $telegram->enableMySql($mysql_credentials);
-        $telegram->handleGetUpdates();
+        $telegram->handle();
     }
 
     public function setWebhook(){
