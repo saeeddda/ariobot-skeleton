@@ -1,5 +1,20 @@
 {
+    "authors": [
+        {
+            "name": "Saeed Noori",
+            "homepage": "https://github.com/saeeddda"
+        }, 
+        {
+            "name": "Saeed Noori",
+            "homepage": "https://saeedna.ir"
+        }
+    ],
     "require": {
-        "longman/telegram-bot": "^0.80.0"
+        "longman/telegram-bot": "^0.83.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
     }
 }

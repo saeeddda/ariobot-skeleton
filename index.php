@@ -1,27 +1,31 @@
 <?php
 
 require_once 'vendor/autoload.php';
-require_once 'autoload.php';
 
-if(!defined('ABSPATH')) define('ABSPATH', __DIR__);
-
+use App\Utilities\Router;
+use App\Utilities\Helpers;
 use Longman\TelegramBot\Telegram;
-use Utilities\Helpers;
-use Utilities\Router;
 
+//Set base dir in helpers class
+Helpers::setBaseDir(__DIR__);
+
+//Create global variable for telegram bot
 global $telegram;
-$telegram = new Telegram(Helpers::config('bot_token'),Helpers::config('bot_username'));
 
+//Get instance of Telegram bot and set to global variable
+$telegram = new Telegram(
+    Helpers::config('bot_token'), 
+    Helpers::config('bot_username')
+);
+
+//Get instance of router
 $router = new Router();
+
+//Set App namespace
 $router->setNamespace('\App');
 
-$router->get('/', 'Bot@index');
-$router->get('/set-webhook', 'Bot@setWebhook');
-$router->post('/webhook', 'Bot@webhook');
+//Include routes from file
+include_once(__DIR__ . '/routes/web.php');
 
-$router->set404(function(){
-    header('HTTP/1.1 404 Not Found');
-    echo 'this is 404 page';
-});
-
+//Run all routes
 $router->run();

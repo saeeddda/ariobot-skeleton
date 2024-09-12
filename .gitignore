@@ -1,2 +1,5 @@
 .idea
-config.json
+config/bot.php
+/config/bot.php
+composer.lock
+/vendor/

@@ -41,6 +41,39 @@ CREATE TABLE IF NOT EXISTS `user_chat` (
   FOREIGN KEY (`chat_id`) REFERENCES `chat` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
+CREATE TABLE IF NOT EXISTS `message_reaction` (
+  `id` bigint UNSIGNED AUTO_INCREMENT COMMENT 'Unique identifier for this entry',
+  `chat_id` bigint COMMENT 'The chat containing the message the user reacted to',
+  `message_id` bigint COMMENT 'Unique identifier of the message inside the chat',
+  `user_id` bigint NULL COMMENT 'Optional. The user that changed the reaction, if the user isn''t anonymous',
+  `actor_chat_id` bigint NULL COMMENT 'Optional. The chat on behalf of which the reaction was changed, if the user is anonymous',
+  `old_reaction` TEXT NOT NULL COMMENT 'Previous list of reaction types that were set by the user',
+  `new_reaction` TEXT NOT NULL COMMENT 'New list of reaction types that have been set by the user',
+  `created_at` timestamp NULL DEFAULT NULL COMMENT 'Entry date creation',
+
+  PRIMARY KEY (`id`),
+  KEY `chat_id` (`chat_id`),
+  KEY `user_id` (`user_id`),
+  KEY `actor_chat_id` (`actor_chat_id`),
+
+  FOREIGN KEY (`chat_id`) REFERENCES `chat` (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
+  FOREIGN KEY (`actor_chat_id`) REFERENCES `chat` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
+
+CREATE TABLE IF NOT EXISTS `message_reaction_count` (
+  `id` bigint UNSIGNED AUTO_INCREMENT COMMENT 'Unique identifier for this entry',
+  `chat_id` bigint COMMENT 'The chat containing the message',
+  `message_id` bigint COMMENT 'Unique message identifier inside the chat',
+  `reactions` TEXT NOT NULL COMMENT 'List of reactions that are present on the message',
+  `created_at` timestamp NULL DEFAULT NULL COMMENT 'Entry date creation',
+
+  PRIMARY KEY (`id`),
+  KEY `chat_id` (`chat_id`),
+
+  FOREIGN KEY (`chat_id`) REFERENCES `chat` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
+
 CREATE TABLE IF NOT EXISTS `inline_query` (
   `id` bigint UNSIGNED COMMENT 'Unique identifier for this query',
   `user_id` bigint NULL COMMENT 'Unique user identifier',
@@ -77,6 +110,7 @@ CREATE TABLE IF NOT EXISTS `message` (
   `id` bigint UNSIGNED COMMENT 'Unique message identifier',
   `message_thread_id` bigint(20) DEFAULT NULL COMMENT 'Unique identifier of a message thread to which the message belongs; for supergroups only',
   `user_id` bigint NULL COMMENT 'Unique user identifier',
+  `sender_boost_count` bigint NULL COMMENT 'If the sender of the message boosted the chat, the number of boosts added by the user',
   `date` timestamp NULL DEFAULT NULL COMMENT 'Date the message was sent in timestamp format',
   `forward_from` bigint NULL DEFAULT NULL COMMENT 'Unique user identifier, sender of the original message',
   `forward_from_chat` bigint NULL DEFAULT NULL COMMENT 'Unique chat identifier, chat the original message belongs to',
@@ -88,7 +122,11 @@ CREATE TABLE IF NOT EXISTS `message` (
   `is_automatic_forward` tinyint(1) DEFAULT 0 COMMENT 'True, if the message is a channel post that was automatically forwarded to the connected discussion group',
   `reply_to_chat` bigint NULL DEFAULT NULL COMMENT 'Unique chat identifier',
   `reply_to_message` bigint UNSIGNED DEFAULT NULL COMMENT 'Message that this message is reply to',
+  `external_reply` TEXT NULL DEFAULT NULL COMMENT 'Optional. Information about the message that is being replied to, which may come from another chat or forum topic',
+  `quote` TEXT NULL DEFAULT NULL COMMENT 'Optional. For replies that quote part of the original message, the quoted part of the message',
+  `reply_to_story` TEXT NULL DEFAULT NULL COMMENT 'Optional. For replies to a story, the original story',
   `via_bot` bigint NULL DEFAULT NULL COMMENT 'Optional. Bot through which the message was sent',
+  `link_preview_options` TEXT NULL DEFAULT NULL COMMENT 'Optional. Options used for link preview generation for the message, if it is a text message and link preview options were changed',
   `edit_date` timestamp NULL DEFAULT NULL COMMENT 'Date the message was last edited in Unix time',
   `has_protected_content` tinyint(1) DEFAULT 0 COMMENT 'True, if the message can''t be forwarded',
   `media_group_id` TEXT COMMENT 'The unique identifier of a media message group this message belongs to',
@@ -102,10 +140,12 @@ CREATE TABLE IF NOT EXISTS `message` (
   `game` TEXT COMMENT 'Game object. Message is a game, information about the game',
   `photo` TEXT COMMENT 'Array of PhotoSize objects. Message is a photo, available sizes of the photo',
   `sticker` TEXT COMMENT 'Sticker object. Message is a sticker, information about the sticker',
+  `story` TEXT COMMENT 'Story object. Message is a forwarded story',
   `video` TEXT COMMENT 'Video object. Message is a video, information about the video',
   `voice` TEXT COMMENT 'Voice Object. Message is a Voice, information about the Voice',
   `video_note` TEXT COMMENT 'VoiceNote Object. Message is a Video Note, information about the Video Note',
   `caption` TEXT COMMENT  'For message with caption, the actual UTF-8 text of the caption',
+  `has_media_spoiler` tinyint(1) DEFAULT 0 COMMENT 'True, if the message media is covered by a spoiler animation',
   `contact` TEXT COMMENT 'Contact object. Message is a shared contact, information about the contact',
   `location` TEXT COMMENT 'Location object. Message is a shared location, information about the location',
   `venue` TEXT COMMENT 'Venue object. Message is a Venue, information about the Venue',
@@ -125,12 +165,19 @@ CREATE TABLE IF NOT EXISTS `message` (
   `pinned_message` TEXT NULL COMMENT 'Message object. Specified message was pinned',
   `invoice` TEXT NULL COMMENT 'Message is an invoice for a payment, information about the invoice',
   `successful_payment` TEXT NULL COMMENT 'Message is a service message about a successful payment, information about the payment',
+  `users_shared` TEXT NULL COMMENT 'Optional. Service message: users were shared with the bot',
+  `chat_shared` TEXT NULL COMMENT 'Optional. Service message: a chat was shared with the bot',
   `connected_website` TEXT NULL COMMENT 'The domain name of the website on which the user has logged in.',
+  `write_access_allowed` TEXT DEFAULT NULL COMMENT 'Service message: the user allowed the bot added to the attachment menu to write messages',
   `passport_data` TEXT NULL COMMENT 'Telegram Passport data',
   `proximity_alert_triggered` TEXT NULL COMMENT 'Service message. A user in the chat triggered another user''s proximity alert while sharing Live Location.',
+  `boost_added` TEXT NULL COMMENT 'Service message: user boosted the chat',
   `forum_topic_created` TEXT DEFAULT NULL COMMENT 'Service message: forum topic created',
+  `forum_topic_edited` TEXT DEFAULT NULL COMMENT 'Service message: forum topic edited',
   `forum_topic_closed` TEXT DEFAULT NULL COMMENT 'Service message: forum topic closed',
   `forum_topic_reopened` TEXT DEFAULT NULL COMMENT 'Service message: forum topic reopened',
+  `general_forum_topic_hidden` TEXT DEFAULT NULL COMMENT 'Service message: the General forum topic hidden',
+  `general_forum_topic_unhidden` TEXT DEFAULT NULL COMMENT 'Service message: the General forum topic unhidden',
   `video_chat_scheduled` TEXT COMMENT 'Service message: video chat scheduled',
   `video_chat_started` TEXT COMMENT 'Service message: video chat started',
   `video_chat_ended` TEXT COMMENT 'Service message: video chat ended',
@@ -286,6 +333,32 @@ CREATE TABLE IF NOT EXISTS `chat_join_request` (
   FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
+CREATE TABLE IF NOT EXISTS `chat_boost_updated` (
+  `id` bigint UNSIGNED AUTO_INCREMENT COMMENT 'Unique identifier for this entry',
+  `chat_id` bigint COMMENT 'Chat which was boosted',
+  `boost` TEXT NOT NULL COMMENT 'Information about the chat boost',
+  `created_at` timestamp NULL DEFAULT NULL COMMENT 'Entry date creation',
+
+  PRIMARY KEY (`id`),
+  KEY `chat_id` (`chat_id`),
+
+  FOREIGN KEY (`chat_id`) REFERENCES `chat` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
+
+CREATE TABLE IF NOT EXISTS `chat_boost_removed` (
+  `id` bigint UNSIGNED AUTO_INCREMENT COMMENT 'Unique identifier for this entry',
+  `chat_id` bigint COMMENT 'Chat which was boosted',
+  `boost_id` varchar(200) NOT NULL COMMENT 'Unique identifier of the boost',
+  `remove_date` timestamp NOT NULL COMMENT 'Point in time (Unix timestamp) when the boost was removed',
+  `source` TEXT NOT NULL COMMENT 'Source of the removed boost',
+  `created_at` timestamp NULL DEFAULT NULL COMMENT 'Entry date creation',
+
+  PRIMARY KEY (`id`),
+  KEY `chat_id` (`chat_id`),
+
+  FOREIGN KEY (`chat_id`) REFERENCES `chat` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
+
 CREATE TABLE IF NOT EXISTS `telegram_update` (
   `id` bigint UNSIGNED COMMENT 'Update''s unique identifier',
   `chat_id` bigint NULL DEFAULT NULL COMMENT 'Unique chat identifier',
@@ -293,6 +366,8 @@ CREATE TABLE IF NOT EXISTS `telegram_update` (
   `edited_message_id` bigint UNSIGNED DEFAULT NULL COMMENT 'New version of a message that is known to the bot and was edited',
   `channel_post_id` bigint UNSIGNED DEFAULT NULL COMMENT 'New incoming channel post of any kind - text, photo, sticker, etc.',
   `edited_channel_post_id` bigint UNSIGNED DEFAULT NULL COMMENT 'New version of a channel post that is known to the bot and was edited',
+  `message_reaction_id` bigint UNSIGNED DEFAULT NULL COMMENT 'A reaction to a message was changed by a user',
+  `message_reaction_count_id` bigint UNSIGNED DEFAULT NULL COMMENT 'Reactions to a message with anonymous reactions were changed',
   `inline_query_id` bigint UNSIGNED DEFAULT NULL COMMENT 'New incoming inline query',
   `chosen_inline_result_id` bigint UNSIGNED DEFAULT NULL COMMENT 'The result of an inline query that was chosen by a user and sent to their chat partner',
   `callback_query_id` bigint UNSIGNED DEFAULT NULL COMMENT 'New incoming callback query',
